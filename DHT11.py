@@ -30,22 +30,25 @@ sensor = Adafruit_DHT.DHT11
 pin = 21
 
 # connect to plotly
-plotly.tools.set_credentials_file(username='Beramos', api_key='jemhzjyun0')
+# plotly.tools.set_credentials_file(username='Beramos', api_key='jemhzjyun0')
 
 # Parameters for data storage
-Ts= 10; # sampling time (s)
-nStore= 500 # number of datapoints to store
+Ts= 1; # sampling time (s)
+nStore= 10 # number of datapoints to store
+i=1
 
-data= pd.DataFrame(data=[0 , 0, 0], columns(['Time','Temperature','Humidity']))
+data= pd.DataFrame({'Time': 0,'Temperature': 0,'Humidity': 0}, columns=['Time','Temperature','Humidity'],index=range(0,nStore-1))
 
-while True:
+# while True:
+for i in range(0,10):
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     if humidity is not None and temperature is not None:
-        file= open('/home/pi/Desktop/RPiProject/DHTlog','w')
-        file.write("<html><head><title>Current Temperature</title></head><body><h1>")
-        file.write("Temperature : {} &#x2103;<br>".format(temperature))
-        file.write("Humidity    : {} %<br>".format(humidity))
-        file.write("</h1></body></html>")
-        file.close()
+        print(temperature)
+        print(humidity)
+        data.loc[i]=pd.Series({'Time': 0,'Temperature': temperature,'Humidity': humidity})
+        
     else:
+        print('missed reading')
+    print(data)
     time.sleep(Ts)
+    i=i+1
