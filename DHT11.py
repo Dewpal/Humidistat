@@ -22,13 +22,22 @@
 import sys
 import time
 import Adafruit_DHT
+import plotly
+import pandas as pd
 
 # Parse command line parameters.
 sensor = Adafruit_DHT.DHT11
 pin = 21
 
+# connect to plotly
+plotly.tools.set_credentials_file(username='Beramos', api_key='jemhzjyun0')
+
 # Parameters for data storage
 Ts= 10; # sampling time (s)
+nStore= 500 # number of datapoints to store
+
+data= pd.DataFrame(data=[0 , 0, 0], columns(['Time','Temperature','Humidity']))
+
 while True:
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     if humidity is not None and temperature is not None:
@@ -38,7 +47,5 @@ while True:
         file.write("Humidity    : {} %<br>".format(humidity))
         file.write("</h1></body></html>")
         file.close()
-        print('written') 
     else:
-        print('damn')
     time.sleep(Ts)
