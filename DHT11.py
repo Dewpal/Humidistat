@@ -24,31 +24,33 @@ import time
 import Adafruit_DHT
 import plotly
 import pandas as pd
+import plotly.plotly as py
+import plotly.graph_objs as go
 
 # Parse command line parameters.
 sensor = Adafruit_DHT.DHT11
 pin = 21
 
 # connect to plotly
-# plotly.tools.set_credentials_file(username='Beramos', api_key='jemhzjyun0')
+plotly.tools.set_credentials_file(username='bramDeJaeg', api_key='jemhzjyun0')
 
 # Parameters for data storage
 Ts= 1; # sampling time (s)
-nStore= 10 # number of datapoints to store
+nStore= 5 # number of datapoints to store
 i=1
 
 data= pd.DataFrame({'Time': 0,'Temperature': 0,'Humidity': 0}, columns=['Time','Temperature','Humidity'],index=range(0,nStore-1))
 
-# while True:
-for i in range(0,10):
+#while True:
+for i in range(0,nStore-1):
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     if humidity is not None and temperature is not None:
-        print(temperature)
-        print(humidity)
-        data.loc[i]=pd.Series({'Time': 0,'Temperature': temperature,'Humidity': humidity})
-        
+        data.loc[i]=pd.Series({'Time': 0,'Temperature': temperature,'Humidity': humidity}) 
     else:
         print('missed reading')
     print(data)
     time.sleep(Ts)
     i=i+1
+
+py.plot([trace],filename = 'basic_TH',)
+      
