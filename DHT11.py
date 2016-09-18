@@ -20,18 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import sys
+import time
 import Adafruit_DHT
 
 # Parse command line parameters.
 sensor = Adafruit_DHT.DHT11
 pin = 21
 
-# Try to grab a sensor reading.  Use the read_retry method which will retry up
-# to 15 times to get a sensor reading (waiting 2 seconds between each retry).
-humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-
-if humidity is not None and temperature is not None:
-    print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
-else:
-    print('Failed to get reading. Try again!')
-    sys.exit(1)
+# Parameters for data storage
+Ts= 10; # sampling time (s)
+while True:
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    if humidity is not None and temperature is not None:
+        file= open('/home/pi/Desktop/RPiProject/DHTlog','w')
+        file.write("<html><head><title>Current Temperature</title></head><body><h1>")
+        file.write("Temperature : {} &#x2103;<br>".format(temperature))
+        file.write("Humidity    : {} %<br>".format(humidity))
+        file.write("</h1></body></html>")
+        file.close()
+        print('written') 
+    else:
+        print('damn')
+    time.sleep(Ts)
