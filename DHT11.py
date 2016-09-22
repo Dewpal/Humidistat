@@ -67,13 +67,13 @@ layout = go.Layout(
 )
 fig=go.Figure(data=[trace], layout=layout)
 
-print py.plot(fig,filename = 'basic_TH',)
+py.plot(fig,filename = 'basic_TH',)
       
 stream=py.Stream('0f1psssxtu')
 stream.open()
 
-while True:
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    i=i+1
-    stream.write({'x': datetime.datetime.now(), 'y': humidity})
-    time.sleep(Ts)
+##while True:
+##    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+##    i=i+1
+##    stream.write({'x': datetime.datetime.now(), 'y': humidity})
+##    time.sleep(Ts)
