@@ -1,0 +1,4 @@
+#!/bin/bash
+
+python2 binInput.py
+sudo eject /dev/sda

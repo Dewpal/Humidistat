@@ -74,5 +74,7 @@ layout = go.Layout(
 )
 fig=go.Figure(data=[trace1,trace2], layout=layout)
 
-py.plot(fig,filename = 'basic_TH',)
-      
+## py.plot(fig,filename = 'basic_TH',)
+
+with open("learn.csv", "w") as f:
+    data.to_csv(f, header=True, index=False)
