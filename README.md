@@ -1,7 +1,7 @@
 # Rasperry Pi projects
 
 ## Humidity controller 
-### Electrical components
+### Hardware components
 * Combined humidity and temperature sensor (DHT22)
 * 8 channel 5V relay board
 * Humidifier
