@@ -2,8 +2,9 @@
 
 ## Humidity controller 
 ### Hardware components
+* Raspberry Pi
 * Combined humidity and temperature sensor (DHT22)
-* 8 channel 5V relay board
+* 1 channel 5V relay board
 * Humidifier
 
 ![Overview](HumidityController/Figures/experimentalSetupIGem.png)
