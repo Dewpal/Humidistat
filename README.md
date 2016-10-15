@@ -14,3 +14,5 @@
 * __DHTxx.py__ provides hardware/software interfaces for the humidity sensors using adafruit software
 
 * __DHTlog__ is a simple HTML page displaying the humidity and temperature.
+
+* __binInput.py__ reads a Pseudorandom binary input signal (CSV) which is applied to the humidityStat for system identification.
