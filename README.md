@@ -1,4 +1,4 @@
-# Rasperry Pi projects
+# Dewpal Software
 
 ## Humidity controller 
 ### Hardware components
@@ -13,4 +13,4 @@
 
 * __DHTxx.py__ provides hardware/software interfaces for the humidity sensors using adafruit software
 
-* __DHTlog__ is the simple HTML page which is updated
+* __DHTlog__ is a simple HTML page displaying the humidity and temperature.
