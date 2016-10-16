@@ -7,7 +7,7 @@
 * 1 channel 5V relay board
 * Humidifier
 
-![Overview](HumidityController/Figures/experimentalSetupIGem.png)
+![Overview](Figures/experimentalSetupIGem.png)
 
 ### Software
 * __bangBangController.py__ implements a multithread controller for the system discussed above.
