@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-#import RPi.GPIO as GPIO
-#import Adafruit_DHT
+import RPi.GPIO as GPIO
+import Adafruit_DHT
 import pandas as pd
 import datetime
 import time
@@ -21,62 +21,50 @@ class virtualSystem:
         qInput.put(u)
         self.inputFrame.pop()
         self.inputFrame.insert(0,u)
-        humidity = (100-0.001*self.humidityFrame[0]+0.001*self.inputFrame[0]-0.001*self.inputFrame[1])*2*self.dt+self.humidityFrame[1]
-        temperature = 25
+        humidity = (100-0.001*self.humidityFrame[0]+0.001*self.inputFrame[0]-0.001*self.inputFrame[1])*2*self.dt+self.humidityFrame[1] # first order difference equation
+        temperature = 25 # constant temperature
         self.humidityFrame.pop()
         self.humidityFrame.insert(0, humidity)
         return self.humidityFrame[0], temperature
 
 class Controller:
-    def __init__(self,relayPin,actionLength):
-        self.Ts=0.5   # (s) sampling time
-        self.LL=90  # lower limit humidity
+    def __init__(self,relayPin,GPIO):
+        self.Ts=5   # (s) sampling time controller
+        self.LL=95  # lower limit humidity
+        self.Time=0 # initialisation
         self.relayPin=relayPin
-        self.Time=0.5
-        self.actionLength=actionLength
-        self.actionTime=2
-        self.cooldownLength=8
-        self.cooldownTime=8
+	    self.GPIO=GPIO
     def run(self):
         global stopTime
         global q
         while time.clock() < stopTime:
             if abs(time.clock()-self.Time) >= self.Ts:
-                humidity=q.get()    # take from queue
-                q.put(humidity)     # put it back as there is no .peek() method apparently
-                if (humidity <= self.LL) and (self.actionTime>0):  # control action up
-                    #GPIO.output(relayPin,GPIO.LOW)
+                humidity=q.get()            # take from queue
+                q.put(humidity)             # put it back as there is no .peek() method apparently
+                if (humidity <= self.LL):   # control action up
+                    GPIO.output(self.relayPin,self.GPIO.LOW)
                     void=qInput.get()
                     qInput.put(1)
-                    self.actionTime-=self.Ts
-                    self.cooldownTime=self.cooldownLength # reset cooldown
                     print('Humidifier: on')
-                elif (self.actionTime<=0) and (self.cooldownTime>=0):                        # cooldownLength control action
-                    self.cooldownTime-=self.Ts
-                    void=qInput.get()
-                    qInput.put(1)
-                    print('Humidifier: off' + 'cooldown time: ' + str(self.cooldownTime))
-                else:                                             # control action down
-                    #GPIO.output(relayPin,GPIO.HIGH)
+                else:                       # control action down
+                    GPIO.output(self.relayPin,self.GPIO.HIGH)
                     void=qInput.get()
                     qInput.put(0)
-                    self.actionTime=self.actionLength # reset control action
-                    self.cooldownTime=self.cooldownLength # reset cooldown
                     print('Humidifier: off')
                 self.Time=time.clock()
-                print('Controller time: '+ str(self.Time))
+	GPIO.output(self.relayPin,self.GPIO.HIGH)
 
 class Sensor:
-    def __init__(self,sensorPin,sensor,Ts,sensorObject):
+    def __init__(self,sensorPin,sensor,Ts,sensorObject,fileName):
         global stopTime
-        self.Ts=Ts  # (s) sampling time
         self.sensorPin=sensorPin
         self.sensor=sensor
-        self.i=0
+        self.Ts=Ts  # (s) sampling time
         self.sensorObject=sensorObject
-        self.Time=0
-        self.f=open('test','w')
+        self.f=open(fileName,'w')
         self.f.write('Time, Temperature, Humidity, relative Time \n')
+        self.i=0    # initialisation
+        self.Time=0 # initialisation
 
     def run(self):
         global q
@@ -96,26 +84,22 @@ class Sensor:
 if __name__ == '__main__':
 
     # Initialisation of parameters and queues
-    stopTime=60                 # (s)
-    q=Queue.Queue(1)
-    qInput=Queue.Queue(1)
+    stopTime=18000          # run program for stopTime seconds
+    q=Queue.Queue(1)        # controller/sensor queue
+    qInput=Queue.Queue(1)   # controller/virtualsystem queue
+
     q.put(40)
     qInput.put(1)
 
+    # Initialising GPIOs of the Rasberry Pi
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(26,GPIO.OUT)
+    GPIO.output(26,GPIO.HIGH) # K1 is off
 
-    # Initialising GPIOs of the rasberryPi
-    #GPIO.setmode(GPIO.BCM)
-    #GPIO.setup(relayPin,GPIO.OUT)
-    #GPIO.output(relayPin,GPIO.HIGH) # K1 is off
+    c=Controller(relayPin=26,GPIO=GPIO) # controller object
+    s=Sensor(sensorPin=21,sensor=v.DHT22,Ts=10,sensorObject=Adafruit_DHT,fileName='data12_9')       # sensorObject = Adafruit_DHT when running with hardware attached,
 
-    # Creating objects
-    c=Controller(relayPin=26, actionLength=2)
-    v=virtualSystem()    # for virtual System
-
-    # v=Adafruit_DHT()                              # for real System
-    s=Sensor(sensorPin=21,sensor='None',Ts=v.dt,sensorObject=v)         # sensor normally Adafruit_DHT.DHT22
-
-    # Main multithread program
+    # Main program
     ct=threading.Thread(target=c.run,args=())
     st=threading.Thread(target=s.run,args=())
 
@@ -125,5 +109,7 @@ if __name__ == '__main__':
     print('Starting controller thread')
     ct.start()
 
-    # Controlled shutdown
-#    GPIO.cleanup()
+    # Controlled shutdown when threads are finished
+    st.join()
+    ct.join()
+    GPIO.cleanup()
