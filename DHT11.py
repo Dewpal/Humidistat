@@ -22,7 +22,6 @@ i=1
 
 data= pd.DataFrame({'Time': 0,'Temperature': 0,'Humidity': 0}, columns=['Time','Temperature','Humidity'],index=range(0,nStore-1))
 
-#while True:
 for i in range(0,nStore-1):
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     if humidity is not None and temperature is not None:
@@ -52,8 +51,8 @@ py.plot(fig,filename = 'basic_TH',)
 stream=py.Stream('0f1psssxtu')
 stream.open()
 
-##while True:
-##    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-##    i=i+1
-##    stream.write({'x': datetime.datetime.now(), 'y': humidity})
-##    time.sleep(Ts)
+while True:
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    i=i+1
+    stream.write({'x': datetime.datetime.now(), 'y': humidity})
+    time.sleep(Ts)
