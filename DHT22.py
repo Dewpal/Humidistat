@@ -23,16 +23,14 @@ i=1
 
 data= pd.DataFrame({'Time': 0,'Temperature': 0,'Humidity': 0}, columns=['Time','Temperature','Humidity'],index=range(0,nStore-1))
 
-while True:
-    for i in range(0,nStore-1):
-        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-        if humidity is not None and temperature is not None:
-            data.loc[i]=pd.Series({'Time': datetime.datetime.now(),'Temperature': temperature,'Humidity': humidity}) 
-        else:
-            print('missed reading')
-        print(data)
-        time.sleep(Ts)
-        i=i+1
+for i in range(0,nStore-1):
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    if humidity is not None and temperature is not None:
+        data.loc[i]=pd.Series({'Time': datetime.datetime.now(),'Temperature': temperature,'Humidity': humidity}) 
+    else:
+        print('missed reading')
+    time.sleep(Ts)
+    i=i+1
 
 trace=go.Scatter(
   x= data.Time,
